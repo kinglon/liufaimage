@@ -7,6 +7,7 @@
 #include "EditDlg.h"
 #include "CompareDlg.h"
 #include "ImageImporter.h"
+#include "ImgFolderManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,8 +76,7 @@ void Cliufaimage2Dlg::InitAllControl()
 	m_imageListCtrl.InsertColumn(3, _T("备注"), LVCFMT_CENTER, 250);
 	m_imageListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
-	// 显示第一页
-	m_CurrentImages.Copy(CImageManager::GetInstance()->FindAllImage());
+	// 显示第一页	
 	ShowPage(1);
 }
 
@@ -87,15 +87,12 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 		return;
 	}
 
-	// 计算总页数	
-	int nPageCount = 0;
-	if (m_CurrentImages.GetSize() > 0)
-	{
-		nPageCount = (m_CurrentImages.GetSize() - 1) / ITEMS_PER_PAGE + 1;
-	}
-
+	int offset = (nPageNumber - 1) * ITEMS_PER_PAGE;
+	int limit = ITEMS_PER_PAGE + 1; // 多获取一个，用于判断是否有下一页
+	CImageManager::GetInstance()->FindImage(m_filterModel, m_filterYear, m_filterStatus, offset, limit, m_CurrentImages);
+	
 	// 没有任何图片
-	if (nPageCount == 0)
+	if (m_CurrentImages.GetSize() == 0)
 	{
 		m_pageNumberCtrl.SetWindowText(L"0/0");
 		m_lastPageCtrl.EnableWindow(FALSE);
@@ -104,33 +101,20 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 		return;
 	}
 
-	if (nPageNumber > nPageCount)
-	{
-		nPageNumber = nPageCount;
-	}
-
-	// 初始翻页按钮、页码
-	CString strPageNumber;
-	strPageNumber.Format(L"%d/%d", nPageNumber, nPageCount);
-	m_pageNumberCtrl.SetWindowText(strPageNumber);
+	// 初始翻页按钮
 	m_lastPageCtrl.EnableWindow(nPageNumber <= 1);
-	m_nextPageCtrl.EnableWindow(nPageNumber >= nPageCount);
+	m_nextPageCtrl.EnableWindow(m_CurrentImages.GetSize() > ITEMS_PER_PAGE);
 
 	// 插入数据
 	m_imageListCtrl.DeleteAllItems();
-	int nStartIndex = (nPageNumber - 1) * ITEMS_PER_PAGE;
-	int nEndIndex = nPageNumber * ITEMS_PER_PAGE;
-	if (nEndIndex >= m_CurrentImages.GetSize())
+	int nEndIndex = min(m_CurrentImages.GetSize(), ITEMS_PER_PAGE);	
+	for (int j=0; j < nEndIndex; j++)
 	{
-		nEndIndex = m_CurrentImages.GetSize();
-	}
-	for (int i = nStartIndex, j=0; i < nEndIndex; i++, j++)
-	{
-		CImageItem& Item = m_CurrentImages[i];
+		CImageItem& Item = m_CurrentImages[j];
 		m_imageListCtrl.InsertItem(j, Item.m_strModel);
 		m_imageListCtrl.SetItemText(j, 1, Item.GetDateTimeString());
 		m_imageListCtrl.SetItemText(j, 2, Item.GetStatusString());
-		m_imageListCtrl.SetItemText(j, 4, Item.m_strRemark);
+		m_imageListCtrl.SetItemText(j, 3, Item.m_strRemark);
 	}
 
 	m_nCurrentPageNumber = nPageNumber;
@@ -181,16 +165,14 @@ HCURSOR Cliufaimage2Dlg::OnQueryDragIcon()
 
 void Cliufaimage2Dlg::OnBnClickedSearch()
 {
-	CString strModel;
-	m_modelInputCtrl.GetWindowText(strModel);
+	m_modelInputCtrl.GetWindowText(m_filterModel);
 
 	CString strYear;
 	m_yearInputCtrl.GetWindowText(strYear);
-	int nYear = _ttoi(strYear);
+	m_filterYear = _ttoi(strYear);
 
 	int nStatus = m_statusComboBox.GetCurSel();
-
-	m_CurrentImages.Copy(CImageManager::GetInstance()->FindImage(strModel, nYear, nStatus));
+	
 	ShowPage(1);
 }
 
@@ -288,6 +270,7 @@ void Cliufaimage2Dlg::OnImageDelete()
 
 	if (MessageBox(L"您确定要删除选择的图片吗？", L"提示", MB_OKCANCEL) == IDOK)
 	{
+		CImgFolderManager::GetInstance()->DeleteImage(m_CurrentImages[nImageIndex].m_strFilePath);
 		CImageManager::GetInstance()->DeleteImage(m_CurrentImages[nImageIndex].m_id);
 		m_CurrentImages.RemoveAt(nImageIndex);
 		ShowPage(m_nCurrentPageNumber);

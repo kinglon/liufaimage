@@ -29,6 +29,12 @@ private:
 	// 页码从1开始
 	int m_nCurrentPageNumber = 1;
 
+	CString m_filterModel;
+
+	int m_filterYear = 0; // 0 is all
+
+	int m_filterStatus = 0;  // 0 is all
+
 protected:
 	HICON m_hIcon;
 

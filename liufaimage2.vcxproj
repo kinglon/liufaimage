@@ -97,9 +97,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\jsoncpp\include;$(SolutionDir)third_party\sqlite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>jsoncpp.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)third_party\jsoncpp\lib\$(ProcessorArchitecture)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -119,9 +122,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\jsoncpp\include;$(SolutionDir)third_party\sqlite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>jsoncpp.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)third_party\jsoncpp\lib\$(ProcessorArchitecture)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -143,11 +149,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\jsoncpp\include;$(SolutionDir)third_party\sqlite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>jsoncpp.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)third_party\jsoncpp\lib\$(ProcessorArchitecture)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -169,11 +178,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\jsoncpp\include;$(SolutionDir)third_party\sqlite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>jsoncpp.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)third_party\jsoncpp\lib\$(ProcessorArchitecture)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -188,22 +200,38 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CompareDlg.h" />
+    <ClInclude Include="DBUtil.h" />
     <ClInclude Include="EditDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="ImageImporter.h" />
     <ClInclude Include="ImageManager.h" />
+    <ClInclude Include="ImgFolderManager.h" />
+    <ClInclude Include="ImgImportDlg.h" />
     <ClInclude Include="liufaimage2.h" />
     <ClInclude Include="liufaimage2Dlg.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SettingDialog.h" />
+    <ClInclude Include="SettingManager.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utility\DumpUtil.h" />
+    <ClInclude Include="Utility\IcrCriticalSection.h" />
+    <ClInclude Include="Utility\ImCharset.h" />
+    <ClInclude Include="Utility\ImPath.h" />
+    <ClInclude Include="Utility\LogBuffer.h" />
+    <ClInclude Include="Utility\LogMacro.h" />
+    <ClInclude Include="Utility\LogUtil.h" />
+    <ClInclude Include="WaterMaskUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompareDlg.cpp" />
+    <ClCompile Include="DBUtil.cpp" />
     <ClCompile Include="EditDlg.cpp" />
     <ClCompile Include="ImageImporter.cpp" />
     <ClCompile Include="ImageManager.cpp" />
+    <ClCompile Include="ImgFolderManager.cpp" />
+    <ClCompile Include="ImgImportDlg.cpp" />
     <ClCompile Include="liufaimage2.cpp" />
     <ClCompile Include="liufaimage2Dlg.cpp" />
     <ClCompile Include="pch.cpp">
@@ -212,7 +240,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="SettingDialog.cpp" />
+    <ClCompile Include="SettingManager.cpp" />
+    <ClCompile Include="third_party\sqlite\src\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Utility\DumpUtil.cpp" />
+    <ClCompile Include="Utility\IcrCriticalSection.cpp" />
+    <ClCompile Include="Utility\ImCharset.cpp" />
+    <ClCompile Include="Utility\ImPath.cpp" />
+    <ClCompile Include="Utility\LogBuffer.cpp" />
+    <ClCompile Include="Utility\LogUtil.cpp" />
+    <ClCompile Include="WaterMaskUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="liufaimage2.rc" />

@@ -16,12 +16,30 @@ public:
 #endif
 
 public:
-	void SetImage(const CImageItem& image);
+	void SetImage(const CImageItem& image) { m_imageItem = image; }
 
-	CImageItem GetImage();
+	CImageItem GetImage() { return m_imageItem; }
+
+private:
+	void InitAllCtrl();
+
+	void ShowImage();
+
+private:
+	CImageItem m_imageItem;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+	CStatic m_imageCtrl;
+	afx_msg void OnBnClickedUpdateimagectrl();
+	CEdit m_modelCtrl;
+	CComboBox m_statusCtrl;
+	CEdit m_remarkCtrl;
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnDblclkImagectrl();
 };

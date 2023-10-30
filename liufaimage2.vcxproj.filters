@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Utility">
+      <UniqueIdentifier>{e41ac864-fb0a-46c8-848a-3d40cf599dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Utility">
+      <UniqueIdentifier>{3254d956-6611-4be4-b9a2-99c82dbac3ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\sqlite">
+      <UniqueIdentifier>{8b6197b2-a9ce-4fe7-814a-c21893e00032}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="liufaimage2.h">
@@ -48,6 +57,45 @@
     <ClInclude Include="CompareDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SettingManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\DumpUtil.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\IcrCriticalSection.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\ImCharset.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\ImPath.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\LogBuffer.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\LogMacro.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\LogUtil.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ImgImportDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterMaskUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ImgFolderManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DBUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="liufaimage2.cpp">
@@ -72,6 +120,45 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CompareDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\DumpUtil.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\IcrCriticalSection.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\ImCharset.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\ImPath.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\LogBuffer.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\LogUtil.cpp">
+      <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ImgImportDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterMaskUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ImgFolderManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\sqlite\src\sqlite3.c">
+      <Filter>源文件\sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="DBUtil.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

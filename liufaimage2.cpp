@@ -6,6 +6,15 @@
 #include "framework.h"
 #include "liufaimage2.h"
 #include "liufaimage2Dlg.h"
+#include "Utility/LogUtil.h"
+#include "Utility/DumpUtil.h"
+#include "Utility/ImPath.h"
+#include "SettingManager.h"
+#include <gdiplus.h>
+
+using namespace Gdiplus;
+
+#pragma comment(lib, "gdiplus.lib") 
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,7 +40,7 @@ Cliufaimage2App::Cliufaimage2App()
 // 唯一的 Cliufaimage2App 对象
 
 Cliufaimage2App theApp;
-
+CLogUtil* g_dllLog = nullptr;
 
 // Cliufaimage2App 初始化
 
@@ -66,6 +75,29 @@ BOOL Cliufaimage2App::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
+	// 单实例
+	const wchar_t* mutexName = L"{DE3FFF1F-B372-4D1F-AADF-B5EEB1ED3ECC}";
+	HANDLE mutexHandle = CreateMutexW(nullptr, TRUE, mutexName);
+	if (mutexHandle == nullptr || GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		AfxMessageBox(L"程序已经在运行");
+		return FALSE;
+	}
+
+	g_dllLog = CLogUtil::GetLog(L"main");
+
+	//初始化崩溃转储机制
+	CDumpUtil::SetDumpFilePath(CImPath::GetDumpPath().c_str());
+	CDumpUtil::Enable(true);
+
+	int nLogLevel = CSettingManager::GetInstance()->GetLogLevel();
+	g_dllLog->SetLogLevel((ELogLevel)nLogLevel);
+
+	// Initialize GDI+
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+
 	Cliufaimage2Dlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
@@ -84,6 +116,11 @@ BOOL Cliufaimage2App::InitInstance()
 		TRACE(traceAppMsg, 0, "警告: 对话框创建失败，应用程序将意外终止。\n");
 		TRACE(traceAppMsg, 0, "警告: 如果您在对话框上使用 MFC 控件，则无法 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS。\n");
 	}
+
+	// Shutdown GDI+
+	GdiplusShutdown(gdiplusToken);
+
+	CloseHandle(mutexHandle);
 
 	// 删除上面创建的 shell 管理器。
 	if (pShellManager != nullptr)
