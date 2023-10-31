@@ -12,6 +12,8 @@ class CImageItem
 public:
 	CString GetDateTimeString();
 
+	CString GetYearString();
+
 	CString GetStatusString();
 
 public:

@@ -24,6 +24,13 @@ CString CImageItem::GetDateTimeString()
 	return formattedDateTime;
 }
 
+CString CImageItem::GetYearString()
+{
+    CTime time(m_nUnixTimeStamp);
+    CString year = time.Format(_T("%Y"));
+    return year;
+}
+
 CString CImageItem::GetStatusString()
 {
 	CString strStatus;
@@ -241,9 +248,9 @@ bool CImageManager::DeleteImage(UINT nImageId)
 bool CImageManager::EnumRecord(void* context, const std::vector<COLUMN_ITEM>& recordVec)
 {
     CArray<CImageItem>* images = (CArray<CImageItem>*)context;
+    CImageItem imageItem;
     for (auto record : recordVec)
-    {
-        CImageItem imageItem;
+    {        
         if (record.strName == COLUMN_PRIMARY_KEY_NAME)
         {
             imageItem.m_id = std::stoi(record.strValue.c_str());
@@ -275,9 +282,9 @@ bool CImageManager::EnumRecord(void* context, const std::vector<COLUMN_ITEM>& re
         if (record.strName == COLUMN_WATERMASK_WORKCONTENT)
         {
             imageItem.m_strWorkContent = CImCharset::UTF8ToUnicode(record.strValue.c_str()).c_str();
-        }
-        images->Add(imageItem);
+        }        
     }
+    images->Add(imageItem);
 
     return true;
 }
@@ -296,7 +303,7 @@ bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, u
     std::string strWhere;
     if (!strModel.IsEmpty())
     {
-        strWhere = strWhere + COLUMN_MODEL + "=" + "\"" + CImCharset::UnicodeToUTF8((LPCWSTR)strModel) + "\"";
+        strWhere = strWhere + COLUMN_MODEL + " like " + "\"%" + CImCharset::UnicodeToUTF8((LPCWSTR)strModel) + "%\"";
     }
 
     if (nYear != 0)

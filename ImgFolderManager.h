@@ -6,7 +6,7 @@ public:
 	static CImgFolderManager* GetInstance();
 
 public:
-	CString GetNextModelName();
+	CString GetNextModelName(int year);
 
 	CString AddImage(const CString& imageFilePath, const CString& year, const CString& modelPrefix);
 

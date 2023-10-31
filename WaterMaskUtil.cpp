@@ -4,6 +4,40 @@
 #include "SettingManager.h"
 #include "Utility/ImPath.h"
 
+using namespace Gdiplus;
+
+CLSID CWaterMaskUtil::GetEncoderClsid(const WCHAR* format)
+{
+    UINT num = 0;   // number of image encoders
+    UINT size = 0;  // size of the image encoder array in bytes
+
+    ImageCodecInfo* pImageCodecInfo = nullptr;
+
+    GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return CLSID_NULL;  // No image encoders found
+
+    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if (pImageCodecInfo == nullptr)
+        return CLSID_NULL;  // Memory allocation failed
+
+    GetImageEncoders(num, size, pImageCodecInfo);
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+        {
+            CLSID clsid;
+            clsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return clsid;
+        }
+    }
+
+    free(pImageCodecInfo);
+    return CLSID_NULL;  // No matching encoder found
+}
+
 CString CWaterMaskUtil::AddWaterMask(const CString& imageFilePath, const CString& title, time_t time, 
     const CString& model, const CString& workContent)
 {
@@ -34,8 +68,8 @@ CString CWaterMaskUtil::AddWaterMask(const CString& imageFilePath, const CString
     Gdiplus::SolidBrush textBrush2(textColor2);
 
     // Draw title
-    float titleX = left + 75;
-    float titleY = top + 5;
+    float titleX = left + 75.0f;
+    float titleY = top + 5.0f;
     const Gdiplus::StringFormat* stringFormat = Gdiplus::StringFormat::GenericDefault();
     graphics.DrawString((LPCWSTR)title, -1, &watermarkFont1, Gdiplus::PointF(titleX, titleY), stringFormat, &textBrush1);
 
@@ -70,8 +104,15 @@ CString CWaterMaskUtil::AddWaterMask(const CString& imageFilePath, const CString
 
     // Save the modified image    
     CString newImageFilePath = CString(CImPath::GetCachePath().c_str()) + model + L".jpg";
-    DeleteFile(newImageFilePath);
-    auto result = originalImage.Save(newImageFilePath, &Gdiplus::ImageFormatJPEG);
+    DeleteFile(newImageFilePath);   
+    CLSID jpgEncoderClsid = GetEncoderClsid(L"image/jpeg");
+    if (jpgEncoderClsid == CLSID_NULL)
+    {
+        LOG_ERROR(L"failed to save the image with water mask, not have jpeg encoder");
+        return L"";
+    }
+
+    auto result = originalImage.Save(newImageFilePath, &jpgEncoderClsid);
     if (result != Gdiplus::Ok)
     {
         LOG_ERROR(L"failed to save the image with water mask, path is %s, error is %d",

@@ -13,15 +13,9 @@ CImgFolderManager* CImgFolderManager::GetInstance()
 	return &instance;
 }
 
-CString CImgFolderManager::GetNextModelName()
+CString CImgFolderManager::GetNextModelName(int year)
 {
-	// 获取今年的年份
-	time_t currentTime = time(NULL);
-	std::tm currentTm;
-	localtime_s(&currentTm, &currentTime);
-	int currentYear = currentTm.tm_year + 1900;  // Add 1900 to get the actual year
-	std::string thisYear = std::to_string(currentYear);
-
+	std::string thisYear = std::to_string(year);
 	auto modelIndexItems = CSettingManager::GetInstance()->GetModelIndexItems();
 	for (auto& item : modelIndexItems)
 	{

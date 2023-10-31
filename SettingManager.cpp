@@ -5,6 +5,11 @@
 #include "Utility/ImPath.h"
 #include "Utility/ImCharset.h"
 
+CSettingManager::CSettingManager()
+{
+    Load();
+}
+
 CSettingManager* CSettingManager::GetInstance()
 {
 	static CSettingManager* pInstance = new CSettingManager();

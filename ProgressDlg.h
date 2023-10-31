@@ -25,6 +25,10 @@ private:
 private:
 	CString m_strTitle;
 
+	int m_nMaxValue = 1;
+
+	int m_nCurrentValue = 0;
+
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_PROGRESS };

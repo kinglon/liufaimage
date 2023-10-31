@@ -39,18 +39,20 @@ void CProgressDlg::SetTitle(const CString& strTitle)
 
 void CProgressDlg::SetMaxValue(int nMaxValue)
 {
-	m_progressCtrl.SetRange(0, nMaxValue);
+	m_nMaxValue = nMaxValue;	
 	if (m_hWnd != NULL)
 	{
+		m_progressCtrl.SetRange(0, nMaxValue);
 		UpdateHintCtrl();
 	}
 }
 
 void CProgressDlg::SetCurrentValue(int nCurrentValue)
 {
-	m_progressCtrl.SetPos(nCurrentValue);
+	m_nCurrentValue = nCurrentValue;	
 	if (m_hWnd != NULL)
 	{
+		m_progressCtrl.SetPos(nCurrentValue);
 		UpdateHintCtrl();
 	}
 }
@@ -75,6 +77,9 @@ BOOL CProgressDlg::OnInitDialog()
 	{
 		SetWindowText(m_strTitle);
 	}
+
+	m_progressCtrl.SetRange(0, m_nMaxValue);
+	m_progressCtrl.SetPos(m_nCurrentValue);
 
 	UpdateHintCtrl();
 

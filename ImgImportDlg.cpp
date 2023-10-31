@@ -7,6 +7,7 @@
 #include <gdiplus.h>
 #include <ctime>
 #include "Utility/ImCharset.h"
+#include "TimeUtil.h"
 
 using namespace Gdiplus;
 
@@ -93,21 +94,28 @@ time_t CImgImportDlg::GetImageCaptureTime(const std::wstring& imagePath)
     if (bitmap->GetLastStatus() == Ok)
     {        
         UINT propertySize = bitmap->GetPropertyItemSize(PropertyTagExifDTOrig);
-        PropertyItem* propertyItem = (PropertyItem*)new char[propertySize];
-        Status status = bitmap->GetPropertyItem(PropertyTagExifDTOrig, propertySize, propertyItem);
-        if (status != Ok)
+        if (propertySize > 0)
         {
-            LOG_ERROR(L"failed to get the property of date time orig, path is %s, error is %d",
-                imagePath.c_str(), status);
+            PropertyItem* propertyItem = (PropertyItem*)new char[propertySize];
+            Status status = bitmap->GetPropertyItem(PropertyTagExifDTOrig, propertySize, propertyItem);
+            if (status != Ok)
+            {
+                LOG_ERROR(L"failed to get the property of date time orig, path is %s, error is %d",
+                    imagePath.c_str(), status);
+            }
+            else
+            {
+                captureTime = CImCharset::AnsiToUnicode(
+                    std::string((char*)propertyItem->value, propertyItem->length).c_str());
+                LOG_DEBUG(L"the date time is %s in the image of %s", captureTime.c_str(), imagePath.c_str());
+            }
+
+            delete[](char*) propertyItem;
         }
         else
         {
-            captureTime = CImCharset::AnsiToUnicode(
-                std::string((char*)propertyItem->value, propertyItem->length).c_str());
-            LOG_DEBUG(L"the date time is %s in the image of %s", captureTime.c_str(), imagePath.c_str());
+            LOG_INFO(L"the image does not have the time of capturing, path is %s", imagePath.c_str());
         }
-        
-        delete[](char*) propertyItem;
     }
     else
     {
@@ -127,8 +135,7 @@ time_t CImgImportDlg::GetImageCaptureTime(const std::wstring& imagePath)
 
     // metadata没有拍摄时间，就取文件的时间
     if (unixTime == 0)
-    {
-        LOG_ERROR(L"failed to get the capturing time, path is %s", imagePath.c_str());
+    {        
         HANDLE hFile = CreateFile(imagePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile != INVALID_HANDLE_VALUE)
         {
@@ -177,7 +184,8 @@ DWORD __stdcall CImgImportDlg::AddWaterMaskProc(LPVOID lpParam)
             continue;
         }
 
-        CString model = CImgFolderManager::GetInstance()->GetNextModelName();
+        int year = CTimeUtil::GetYear(captureTime);
+        CString model = CImgFolderManager::GetInstance()->GetNextModelName(year);
         CWaterMaskUtil waterMaskUtil;
         CString imageWithMask = waterMaskUtil.AddWaterMask(image.c_str(),
             CSettingManager::GetInstance()->GetWaterMarkTitle(), captureTime, model,

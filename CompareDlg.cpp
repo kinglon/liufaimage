@@ -102,7 +102,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_leftImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl1.SetWindowText(m_leftImageItem.m_strModel);
+		m_modelCtrl1.SetWindowText(m_leftImageItem.m_strModel + L"  " + m_leftImageItem.GetYearString());
 		InitImageCtrl(&m_imageCtrl1, m_leftImageItem.m_strFilePath);
 		m_statusCtrl1.SetCurSel(m_leftImageItem.m_nStatus - 1);
 		m_remarkCtrl1.SetWindowText(m_leftImageItem.m_strRemark);
@@ -110,7 +110,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_rightImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl2.SetWindowText(m_rightImageItem.m_strModel);
+		m_modelCtrl2.SetWindowText(m_rightImageItem.m_strModel + L"  " + m_rightImageItem.GetYearString());
 		InitImageCtrl(&m_imageCtrl2, m_rightImageItem.m_strFilePath);
 		m_statusCtrl2.SetCurSel(m_rightImageItem.m_nStatus - 1);
 		m_remarkCtrl2.SetWindowText(m_rightImageItem.m_strRemark);
@@ -193,6 +193,15 @@ END_MESSAGE_MAP()
 BOOL CCompareDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	m_statusCtrl1.AddString(L"未处理");
+	m_statusCtrl1.AddString(L"有问题");
+	m_statusCtrl1.AddString(L"没问题");
+	m_statusCtrl1.SetCurSel(0);
+	m_statusCtrl2.AddString(L"未处理");
+	m_statusCtrl2.AddString(L"有问题");
+	m_statusCtrl2.AddString(L"没问题");
+	m_statusCtrl2.SetCurSel(0);
 
 	ShowImage(m_currentIndex);
 

@@ -4,7 +4,7 @@
 #include "SettingManager.h"
 #include "ImgImportDlg.h"
 
-void CImageImporter::Import(CWnd* parentWnd, const CString& strImagePath)
+void CImageImporter::Import(CWnd* parentWnd)
 {
 	CString strTitle = CSettingManager::GetInstance()->GetWaterMarkTitle();
 	CString strModelPrefix = CSettingManager::GetInstance()->GetModelPrefix();

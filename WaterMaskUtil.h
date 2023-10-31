@@ -8,5 +8,7 @@ public:
 
 private:
 	static Gdiplus::Color ParseColorString(const CString& colorString);
+
+	static CLSID GetEncoderClsid(const WCHAR* format);
 };
 

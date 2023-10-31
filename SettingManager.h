@@ -34,6 +34,9 @@ public:
 
 class CSettingManager
 {
+protected:
+	CSettingManager();
+
 public:
 	static CSettingManager* GetInstance();
 

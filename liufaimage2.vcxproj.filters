@@ -96,6 +96,9 @@
     <ClInclude Include="DBUtil.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TimeUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="liufaimage2.cpp">
@@ -159,6 +162,9 @@
       <Filter>源文件\sqlite</Filter>
     </ClCompile>
     <ClCompile Include="DBUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeUtil.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

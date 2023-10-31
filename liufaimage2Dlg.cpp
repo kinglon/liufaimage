@@ -70,11 +70,11 @@ void Cliufaimage2Dlg::InitAllControl()
 	m_statusComboBox.SetCurSel(0);
 
 	// 初始化图片列表控件的头部
-	m_imageListCtrl.InsertColumn(0, _T("型号"), LVCFMT_CENTER, 100);
+	m_imageListCtrl.InsertColumn(0, _T("型号"), LVCFMT_CENTER, 180);
 	m_imageListCtrl.InsertColumn(1, _T("时间"), LVCFMT_CENTER, 150);
-	m_imageListCtrl.InsertColumn(2, _T("状态"), LVCFMT_CENTER, 50);
-	m_imageListCtrl.InsertColumn(3, _T("备注"), LVCFMT_CENTER, 250);
-	m_imageListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_imageListCtrl.InsertColumn(2, _T("状态"), LVCFMT_CENTER, 70);
+	m_imageListCtrl.InsertColumn(3, _T("备注"), LVCFMT_LEFT, 300);
+	m_imageListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT);	
 
 	// 显示第一页	
 	ShowPage(1);
@@ -102,7 +102,7 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 	}
 
 	// 初始翻页按钮
-	m_lastPageCtrl.EnableWindow(nPageNumber <= 1);
+	m_lastPageCtrl.EnableWindow(nPageNumber > 1);
 	m_nextPageCtrl.EnableWindow(m_CurrentImages.GetSize() > ITEMS_PER_PAGE);
 
 	// 插入数据
@@ -170,8 +170,7 @@ void Cliufaimage2Dlg::OnBnClickedSearch()
 	CString strYear;
 	m_yearInputCtrl.GetWindowText(strYear);
 	m_filterYear = _ttoi(strYear);
-
-	int nStatus = m_statusComboBox.GetCurSel();
+	m_filterStatus = m_statusComboBox.GetCurSel();
 	
 	ShowPage(1);
 }
@@ -199,13 +198,8 @@ void Cliufaimage2Dlg::OnBnClickedSetting()
 
 void Cliufaimage2Dlg::OnBnClickedExportImage()
 {
-	CFolderPickerDialog dlg(nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST, this);
-	if (dlg.DoModal() == IDOK)
-	{
-		CString selectedFolderPath = dlg.GetFolderPath();
-		CImageImporter imgImporter;
-		imgImporter.Import(this, selectedFolderPath);
-	}
+	CImageImporter imgImporter;
+	imgImporter.Import(this);
 }
 
 void Cliufaimage2Dlg::OnNMRClickImageList(NMHDR* pNMHDR, LRESULT* pResult)
