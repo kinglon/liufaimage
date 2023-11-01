@@ -5,14 +5,14 @@
     ],    
     "model_prefix":"",    
     "title":"",
-    "water_mask": {
-        "offset_left":40,
-        "offset_bottom":40,
-        "width":450,
-        "height":270,
-        "bgcolor":"0fc1ac98",
-        "font_color1":"ffffffff",
-        "font_color2":"ff000000"
-    },
+	"water_mask" : 
+	{
+		"font_color1" : "ffffffff",
+		"font_color2" : "ff000000",
+		"height" : 605,
+		"offset_bottom" : 66,
+		"offset_left" : 58,
+		"width" : 1060
+	},
     "work_content":""
 }

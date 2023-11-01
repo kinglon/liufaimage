@@ -95,6 +95,7 @@ CString CImgFolderManager::AddImage(const CString& imageFilePath, const CString&
 
 bool CImgFolderManager::ReplaceImage(const CString& srcImageFilePath, const CString& destImageFilePath)
 {
+	DeleteFile(destImageFilePath);
 	if (MoveFile(srcImageFilePath, destImageFilePath))
 	{		
 		return true;

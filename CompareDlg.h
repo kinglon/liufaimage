@@ -39,6 +39,8 @@ private:
 	// model为空表示该图片无效
 	CImageItem m_rightImageItem;
 
+	std::vector<HBITMAP> m_imageHandle;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 

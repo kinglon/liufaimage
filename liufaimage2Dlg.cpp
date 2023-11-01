@@ -123,12 +123,7 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 int Cliufaimage2Dlg::GetCurrentSelImageIndex()
 {
 	int nIndex = m_imageListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if (nIndex == -1)
-	{
-		return -1;
-	}
-	int nImageIndex = (m_nCurrentPageNumber - 1) * ITEMS_PER_PAGE + nIndex;
-	return nImageIndex;
+	return nIndex;
 }
 
 void Cliufaimage2Dlg::OnPaint()

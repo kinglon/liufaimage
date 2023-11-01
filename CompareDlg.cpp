@@ -21,6 +21,11 @@ CCompareDlg::CCompareDlg(CWnd* pParent /*=nullptr*/)
 
 CCompareDlg::~CCompareDlg()
 {
+	for (auto& handle : m_imageHandle)
+	{
+		DeleteObject(handle);
+	}
+	m_imageHandle.clear();
 }
 
 void CCompareDlg::SetImages(CArray<CImageItem>* images, int nCurrentIndex)
@@ -102,7 +107,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_leftImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl1.SetWindowText(m_leftImageItem.m_strModel + L"  " + m_leftImageItem.GetYearString());
+		m_modelCtrl1.SetWindowText(m_leftImageItem.GetYearString() + L"年  " + m_leftImageItem.m_strModel );
 		InitImageCtrl(&m_imageCtrl1, m_leftImageItem.m_strFilePath);
 		m_statusCtrl1.SetCurSel(m_leftImageItem.m_nStatus - 1);
 		m_remarkCtrl1.SetWindowText(m_leftImageItem.m_strRemark);
@@ -110,7 +115,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_rightImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl2.SetWindowText(m_rightImageItem.m_strModel + L"  " + m_rightImageItem.GetYearString());
+		m_modelCtrl2.SetWindowText(m_rightImageItem.GetYearString() + L"年  " + m_rightImageItem.m_strModel);
 		InitImageCtrl(&m_imageCtrl2, m_rightImageItem.m_strFilePath);
 		m_statusCtrl2.SetCurSel(m_rightImageItem.m_nStatus - 1);
 		m_remarkCtrl2.SetWindowText(m_rightImageItem.m_strRemark);
@@ -130,53 +135,52 @@ void CCompareDlg::ResetAllCtrl()
 	m_statusCtrl2.SetCurSel(0);
 	m_remarkCtrl1.SetWindowText(L"");
 	m_remarkCtrl2.SetWindowText(L"");
+
+	for (auto& handle : m_imageHandle)
+	{
+		DeleteObject(handle);
+	}
+	m_imageHandle.clear();
 }
 
 void CCompareDlg::InitImageCtrl(CStatic* imageCtrl, const CString& imgFilePath)
 {
-	CImage image;
-	HRESULT hr = image.Load(imgFilePath);
-	if (!SUCCEEDED(hr))
+	Gdiplus::Bitmap* originalImage = Gdiplus::Bitmap::FromFile(imgFilePath);
+	if (originalImage == nullptr)
 	{
-		LOG_ERROR(L"failed to load image %s, error is %x", (LPCWSTR)imgFilePath, hr);
+		LOG_ERROR(L"failed to load image, path is %s", (LPCWSTR)imgFilePath);
 		return;
 	}
 
-	int imageWidth = image.GetWidth();
-	int imageHeight = image.GetHeight();
+	int imageWidth = originalImage->GetWidth();
+	int imageHeight = originalImage->GetHeight();
 
 	CRect rect;
 	imageCtrl->GetClientRect(rect);
 	int controlWidth = rect.Width();
 	int controlHeight = rect.Height();
-
 	double widthRatio = controlWidth * 1.0 / imageWidth;
 	double heightRatio = controlHeight * 1.0 / imageHeight;
 	double aspectRatio = min(widthRatio, heightRatio);
 	int displayWidth = (int)(imageWidth * aspectRatio);
 	int displayHeight = (int)(imageHeight * aspectRatio);
-	int xPos = (controlWidth - displayWidth) / 2;
-	int yPos = (controlHeight - displayHeight) / 2;
 
-	// Create a compatible device context
-	CDC dc;
-	dc.CreateCompatibleDC(NULL);
+	Gdiplus::Bitmap scaledImage(displayWidth, displayHeight, originalImage->GetPixelFormat());
+	Gdiplus::Graphics graphics(&scaledImage);
+	graphics.SetInterpolationMode(Gdiplus::InterpolationMode::InterpolationModeHighQualityBicubic);
+	graphics.DrawImage(originalImage, 0, 0, displayWidth, displayHeight);
+	delete originalImage;
+	originalImage = nullptr;
 
-	// Create a CBitmap and select it into the device context
-	CBitmap bitmap;
-	bitmap.CreateCompatibleBitmap(&dc, image.GetWidth(), image.GetHeight());
-	CBitmap* pOldBitmap = dc.SelectObject(&bitmap);
-
-	// Draw the image onto the bitmap
-	image.BitBlt(dc.GetSafeHdc(), 0, 0);
-
-	// Clean up
-	dc.SelectObject(pOldBitmap);
-
-	// Draw the scaled bitmap on the control
-	CDC* pStaticDC = imageCtrl->GetDC();
-	pStaticDC->StretchBlt(xPos, yPos, displayWidth, displayHeight, &dc, 0, 0, imageWidth, imageHeight, SRCCOPY);
-	imageCtrl->ReleaseDC(pStaticDC);
+	HBITMAP imageHandle = NULL;
+	Gdiplus::Status status = scaledImage.GetHBITMAP(Gdiplus::Color::Black, &imageHandle);
+	if (status != Gdiplus::Ok)
+	{
+		LOG_ERROR(L"failed to call GetHBITMAP, error is %d", status);
+		return;
+	}
+	imageCtrl->SetBitmap(imageHandle);
+	m_imageHandle.push_back(imageHandle);
 }
 
 
@@ -259,15 +263,7 @@ void CCompareDlg::OnClickedNextpagectrl()
 void CCompareDlg::OnClickedSavectrl()
 {
 	if (!m_leftImageItem.m_strModel.IsEmpty())
-	{
-		CString model;
-		m_modelCtrl1.GetWindowText(model);
-		if (model.IsEmpty())
-		{
-			MessageBox(L"左边的型号不能为空", L"提示", MB_OK);
-			return;
-		}
-		m_leftImageItem.m_strModel = model;
+	{		
 		m_leftImageItem.m_nStatus = m_statusCtrl1.GetCurSel() + 1;
 		m_remarkCtrl1.GetWindowText(m_leftImageItem.m_strRemark);
 		CImageManager::GetInstance()->UpdateImage(m_leftImageItem);
@@ -282,17 +278,19 @@ void CCompareDlg::OnClickedSavectrl()
 	}
 
 	if (!m_rightImageItem.m_strModel.IsEmpty())
-	{
-		CString model;
-		m_modelCtrl2.GetWindowText(model);
-		if (model.IsEmpty())
-		{
-			MessageBox(L"右边的型号不能为空", L"提示", MB_OK);
-			return;
-		}
-		m_rightImageItem.m_strModel = model;
+	{		
 		m_rightImageItem.m_nStatus = m_statusCtrl2.GetCurSel() + 1;
 		m_remarkCtrl2.GetWindowText(m_rightImageItem.m_strRemark);
 		CImageManager::GetInstance()->UpdateImage(m_rightImageItem);
+		for (int i = 0; i < m_images->GetSize(); i++)
+		{
+			if (m_images->GetAt(i).m_id == m_rightImageItem.m_id)
+			{
+				m_images->GetAt(i) = m_rightImageItem;
+				break;
+			}
+		}
 	}
+
+	MessageBox(L"保存成功", L"提示", MB_OK);
 }

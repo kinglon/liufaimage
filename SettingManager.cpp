@@ -87,7 +87,6 @@ void CSettingManager::Load()
         m_waterMaskSetting.m_offsetBottom = waterMask["offset_bottom"].asInt();
         m_waterMaskSetting.m_width = waterMask["width"].asInt();
         m_waterMaskSetting.m_height = waterMask["height"].asInt();
-        m_waterMaskSetting.m_bgColor = CImCharset::UTF8ToUnicode(waterMask["bgcolor"].asString().c_str()).c_str();
         m_waterMaskSetting.m_fontColor1 = CImCharset::UTF8ToUnicode(waterMask["font_color1"].asString().c_str()).c_str();
         m_waterMaskSetting.m_fontColor2 = CImCharset::UTF8ToUnicode(waterMask["font_color2"].asString().c_str()).c_str();     
     }
@@ -122,7 +121,6 @@ void CSettingManager::Save()
     waterMask["offset_bottom"] = m_waterMaskSetting.m_offsetBottom;
     waterMask["width"] = m_waterMaskSetting.m_width;
     waterMask["height"] = m_waterMaskSetting.m_height;
-    waterMask["bgcolor"] = CImCharset::UnicodeToUTF8((LPCWSTR)m_waterMaskSetting.m_bgColor);
     waterMask["font_color1"] = CImCharset::UnicodeToUTF8((LPCWSTR)m_waterMaskSetting.m_fontColor1);
     waterMask["font_color2"] = CImCharset::UnicodeToUTF8((LPCWSTR)m_waterMaskSetting.m_fontColor2);
     root["water_mask"] = waterMask;

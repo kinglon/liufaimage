@@ -20,6 +20,10 @@ CEditDlg::CEditDlg(CWnd* pParent /*=nullptr*/)
 
 CEditDlg::~CEditDlg()
 {
+	if (m_imageHandle != NULL)
+	{
+		DeleteObject(m_imageHandle);
+	}
 }
 
 void CEditDlg::DoDataExchange(CDataExchange* pDX)
@@ -44,49 +48,47 @@ void CEditDlg::InitAllCtrl()
 
 void CEditDlg::ShowImage()
 {
-	CImage image;
-	HRESULT hr = image.Load(m_imageItem.m_strFilePath);
-	if (!SUCCEEDED(hr))
+	Gdiplus::Bitmap* originalImage = Gdiplus::Bitmap::FromFile(m_imageItem.m_strFilePath);
+	if (originalImage == nullptr)
 	{
-		LOG_ERROR(L"failed to load image %s, error is %x", (LPCWSTR)m_imageItem.m_strFilePath, hr);
+		LOG_ERROR(L"failed to load image, path is %s", (LPCWSTR)m_imageItem.m_strFilePath);
 		return;
 	}
 	
-	int imageWidth = image.GetWidth();
-	int imageHeight = image.GetHeight();	
+	int imageWidth = originalImage->GetWidth();
+	int imageHeight = originalImage->GetHeight();
 	
 	CRect rect;
 	m_imageCtrl.GetClientRect(rect);
 	int controlWidth = rect.Width();
 	int controlHeight = rect.Height();
-
 	double widthRatio = controlWidth * 1.0 / imageWidth;
 	double heightRatio = controlHeight * 1.0 / imageHeight;
 	double aspectRatio = min(widthRatio, heightRatio);
 	int displayWidth = (int)(imageWidth * aspectRatio);
 	int displayHeight = (int)(imageHeight * aspectRatio);
-	int xPos = (controlWidth - displayWidth) / 2;
-	int yPos = (controlHeight - displayHeight) / 2;
-	
-	// Create a compatible device context
-	CDC dc;
-	dc.CreateCompatibleDC(NULL);
 
-	// Create a CBitmap and select it into the device context
-	CBitmap bitmap;
-	bitmap.CreateCompatibleBitmap(&dc, image.GetWidth(), image.GetHeight());
-	CBitmap* pOldBitmap = dc.SelectObject(&bitmap);
+	Gdiplus::Bitmap scaledImage(displayWidth, displayHeight, originalImage->GetPixelFormat());
+	Gdiplus::Graphics graphics(&scaledImage);
+	graphics.SetInterpolationMode(Gdiplus::InterpolationMode::InterpolationModeHighQualityBicubic);
+	graphics.DrawImage(originalImage, 0, 0, displayWidth, displayHeight);
+	delete originalImage;
+	originalImage = nullptr;
 
-	// Draw the image onto the bitmap
-	image.BitBlt(dc.GetSafeHdc(), 0, 0);
+	if (m_imageHandle != NULL)
+	{
+		m_imageCtrl.SetBitmap(NULL);
+		DeleteObject(m_imageHandle);
+		m_imageHandle = NULL;
+	}
 
-	// Clean up
-	dc.SelectObject(pOldBitmap);
-
-	// Draw the scaled bitmap on the control
-	CDC* pStaticDC = m_imageCtrl.GetDC();
-	pStaticDC->StretchBlt(xPos, yPos, displayWidth, displayHeight, &dc, 0, 0, imageWidth, imageHeight, SRCCOPY);
-	m_imageCtrl.ReleaseDC(pStaticDC);
+	Gdiplus::Status status = scaledImage.GetHBITMAP(Gdiplus::Color::Black, &m_imageHandle);	
+	if (status != Gdiplus::Ok)
+	{
+		LOG_ERROR(L"failed to call GetHBITMAP, error is %d", status);
+		return;
+	}
+	m_imageCtrl.SetBitmap(m_imageHandle);
 }
 
 BEGIN_MESSAGE_MAP(CEditDlg, CDialogEx)

@@ -183,7 +183,7 @@ void CImageManager::GetColumnItems(const CImageItem& image, std::vector<COLUMN_I
     COLUMN_ITEM workContentColumn;
     workContentColumn.strName = COLUMN_WATERMASK_WORKCONTENT;
     workContentColumn.dataType = DB_DATA_TYPE_STR;
-    workContentColumn.strValue = CImCharset::UnicodeToUTF8((LPCWSTR)image.m_strWaterMaskTitle);
+    workContentColumn.strValue = CImCharset::UnicodeToUTF8((LPCWSTR)image.m_strWorkContent);
     columnVec.push_back(workContentColumn);
 }
 

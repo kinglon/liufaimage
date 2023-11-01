@@ -25,8 +25,6 @@ public:
 
 	int m_height = 270;
 
-	CString m_bgColor;
-
 	CString m_fontColor1;
 
 	CString m_fontColor2;

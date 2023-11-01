@@ -28,6 +28,8 @@ private:
 private:
 	CImageItem m_imageItem;
 
+	HBITMAP m_imageHandle = NULL;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
