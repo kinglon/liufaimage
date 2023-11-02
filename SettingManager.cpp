@@ -66,6 +66,11 @@ void CSettingManager::Load()
         m_strWorkContent = CImCharset::UTF8ToUnicode(root["work_content"].asString().c_str()).c_str();
     }
 
+    if (root.isMember("year"))
+    {
+        m_nYear = root["year"].asInt();
+    }
+
     m_modeIndexItems.clear();
     if (root.isMember("model_next_index"))
     {
@@ -73,6 +78,7 @@ void CSettingManager::Load()
         for (Json::Value& childValue : root["model_next_index"])
         {
             modelIndexItem.m_year = childValue["year"].asString();
+            modelIndexItem.m_modelPrefix = childValue["model_prefix"].asString();
             modelIndexItem.m_yd = childValue["YD"].asInt();
             modelIndexItem.m_v = childValue["V"].asInt();
             modelIndexItem.m_a = childValue["A"].asInt();
@@ -105,11 +111,13 @@ void CSettingManager::Save()
     root["title"] = CImCharset::UnicodeToUTF8(m_strWaterMarkTitle);
     root["model_prefix"] = CImCharset::UnicodeToUTF8(m_strModelPrefix);
     root["work_content"] = CImCharset::UnicodeToUTF8(m_strWorkContent);
+    root["year"] = m_nYear;
 
     for (auto& item : m_modeIndexItems)
     {
         Json::Value childValue = Json::objectValue;
         childValue["year"] = item.m_year;
+        childValue["model_prefix"] = item.m_modelPrefix;
         childValue["YD"] = item.m_yd;
         childValue["V"] = item.m_v;
         childValue["A"] = item.m_a;

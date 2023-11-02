@@ -13,13 +13,13 @@ CImgFolderManager* CImgFolderManager::GetInstance()
 	return &instance;
 }
 
-CString CImgFolderManager::GetNextModelName(int year)
+CString CImgFolderManager::GetNextModelName(int year, const std::string& modelPrefix)
 {
 	std::string thisYear = std::to_string(year);
 	auto modelIndexItems = CSettingManager::GetInstance()->GetModelIndexItems();
 	for (auto& item : modelIndexItems)
 	{
-		if (item.m_year == thisYear)
+		if (item.m_year == thisYear && item.m_modelPrefix == modelPrefix)
 		{
 			if (item.m_yd >= MAX_YD && item.m_v >= MAX_V && item.m_a >= MAX_A)
 			{
@@ -42,7 +42,7 @@ CString CImgFolderManager::GetNextModelName(int year)
 			}
 
 			CString modelIndex;
-			modelIndex.Format(L"YD%c.V%d.A%d", item.m_yd - 1 + 'A', item.m_v, item.m_a);
+			modelIndex.Format(L"%c.V%d.A%d", item.m_yd - 1 + 'A', item.m_v, item.m_a);
 			return CSettingManager::GetInstance()->GetModelPrefix() + modelIndex;
 		}
 	}
@@ -50,12 +50,13 @@ CString CImgFolderManager::GetNextModelName(int year)
 	// 如果没有找到当年的索引配置
 	CModelIndexItem thisYearIndexItem;
 	thisYearIndexItem.m_year = thisYear;
+	thisYearIndexItem.m_modelPrefix = modelPrefix;
 	thisYearIndexItem.m_yd = 1;
 	thisYearIndexItem.m_v = 1;
 	thisYearIndexItem.m_a = 1;
 	modelIndexItems.push_back(thisYearIndexItem);
 	CSettingManager::GetInstance()->SetModelItemIndex(modelIndexItems);
-	return CSettingManager::GetInstance()->GetModelPrefix() + L"YDA.V1.A1";
+	return CSettingManager::GetInstance()->GetModelPrefix() + L"A.V1.A1";
 }
 
 CString CImgFolderManager::GetImagePath(const CString& year, const CString& modelPrefix)
@@ -93,6 +94,30 @@ CString CImgFolderManager::AddImage(const CString& imageFilePath, const CString&
 	return newFilePath;
 }
 
+CString CImgFolderManager::AddOriginImage(const CString& imageFilePath)
+{
+	CString newPath = (CImPath::GetDataPath() + L"origin_images\\").c_str();
+	if (!PathFileExists((LPCWSTR)newPath))
+	{
+		CreateDirectory((LPCWSTR)newPath, NULL);
+	}
+	CString guid = GetGuid();
+	CString newFilePath = newPath;
+	if (!guid.IsEmpty())
+	{
+		newFilePath += GetGuid() + imageFilePath.Mid(imageFilePath.ReverseFind(L'.'));
+	}
+	else
+	{
+		newFilePath += imageFilePath.Mid(imageFilePath.ReverseFind(L'\\') + 1);
+	}
+	if (!CopyFile(imageFilePath, newFilePath, TRUE))
+	{
+		LOG_ERROR(L"failed to add origin image %s", (LPCTSTR)newFilePath);
+	}
+	return newFilePath;
+}
+
 bool CImgFolderManager::ReplaceImage(const CString& srcImageFilePath, const CString& destImageFilePath)
 {
 	DeleteFile(destImageFilePath);
@@ -111,4 +136,24 @@ bool CImgFolderManager::ReplaceImage(const CString& srcImageFilePath, const CStr
 bool CImgFolderManager::DeleteImage(const CString& imageFilePath)
 {
 	return DeleteFile(imageFilePath) ? true : false;
+}
+
+bool CImgFolderManager::DeleteOriginImage(const CString& imageFilePath)
+{
+	return DeleteFile(imageFilePath) ? true : false;
+}
+
+CString CImgFolderManager::GetGuid()
+{
+	GUID guid;
+	if (CoCreateGuid(&guid) == S_OK) 
+	{
+		wchar_t guidString[40] = { 0 };
+		if (StringFromGUID2(guid, guidString, 40) != 0) 
+		{
+			return guidString;
+		}
+	}
+	
+	return L"";
 }

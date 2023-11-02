@@ -7,6 +7,8 @@ class CModelIndexItem
 public:
 	std::string m_year;
 
+	std::string m_modelPrefix;
+
 	int m_yd = 1;
 
 	int m_v = 1;
@@ -59,6 +61,10 @@ public:
 
 	const CWaterMaskSetting GetWaterMaskSetting() { return m_waterMaskSetting; }
 
+	int GetYear() { return m_nYear; }
+
+	void SetYear(int nYear) { m_nYear = nYear; }
+
 	void Save();
 
 private:
@@ -76,4 +82,6 @@ private:
 	std::vector<CModelIndexItem> m_modeIndexItems;
 
 	CWaterMaskSetting m_waterMaskSetting;
+
+	int m_nYear = 2023;
 };

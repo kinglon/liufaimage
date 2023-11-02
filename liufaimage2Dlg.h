@@ -59,4 +59,5 @@ public:
 	afx_msg void OnImageEdit();
 	afx_msg void OnImageCompare();
 	afx_msg void OnImageDelete();
+	afx_msg void OnBnClickedImportFolderCtrl();
 };

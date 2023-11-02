@@ -10,9 +10,7 @@
 class CImageItem
 {
 public:
-	CString GetDateTimeString();
-
-	CString GetYearString();
+	CString GetCapturingDateTimeString();
 
 	CString GetStatusString();
 
@@ -22,10 +20,17 @@ public:
 
 	CString m_strModel;
 
+	// 图片所属的年份
+	int m_nYear = 0;
+
 	// 图片拍摄时间，Unix 时间戳，单位秒
 	time_t m_nUnixTimeStamp = 0;
 
+	// 带有水印的图片
 	CString m_strFilePath;
+
+	// 原图的图片
+	CString m_strOriginFilePath;
 
 	// 图片状态
 	int m_nStatus = IMAGE_STATUS_NOT_PROCESS;

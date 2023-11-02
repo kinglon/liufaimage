@@ -84,6 +84,8 @@ BOOL Cliufaimage2App::InitInstance()
 		return FALSE;
 	}
 
+	CoInitialize(nullptr);
+
 	g_dllLog = CLogUtil::GetLog(L"main");
 
 	//初始化崩溃转储机制
@@ -121,6 +123,8 @@ BOOL Cliufaimage2App::InitInstance()
 	GdiplusShutdown(gdiplusToken);
 
 	CloseHandle(mutexHandle);
+
+	CoUninitialize();
 
 	// 删除上面创建的 shell 管理器。
 	if (pShellManager != nullptr)

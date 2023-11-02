@@ -87,7 +87,7 @@ CString CWaterMaskUtil::AddWaterMask(const CString& imageFilePath, const CString
     graphics.DrawString((LPCWSTR)fdt, -1, &timeFont, timeOrigin, stringFormat, &textBrush1);
 
     const float bottomColumn1Offset = 54.0f;
-    const float bottomColumn2Offset = 365.0f;
+    const float bottomColumn2Offset = 405.0f;
     const float rowTopPadding = 35.0f;
     float nLineHeight = bottomRegionRect.Height / 3.0f;
     Gdiplus::Font bottomFont(L"Î¢ÈíÑÅºÚ", 40);

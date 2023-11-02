@@ -10,25 +10,20 @@ using namespace std;
 #define TABLE_NAME  "image"
 #define COLUMN_PRIMARY_KEY_NAME    "id"
 #define COLUMN_MODEL    "model"
+#define COLUMN_YEAR    "year"
 #define COLUMN_TIMESTAMP    "time"
 #define COLUMN_FILE_PATH    "filepath"
+#define COLUMN_ORIGIN_FILE_PATH    "originfilepath"
 #define COLUMN_STATUS    "status"
 #define COLUMN_REMARK    "remark"
 #define COLUMN_WATERMASK_TITLE    "title"
 #define COLUMN_WATERMASK_WORKCONTENT    "workcontent"
 
-CString CImageItem::GetDateTimeString()
+CString CImageItem::GetCapturingDateTimeString()
 {
 	CTime time(m_nUnixTimeStamp);
 	CString formattedDateTime = time.Format(_T("%Y-%m-%d %H:%M"));
 	return formattedDateTime;
-}
-
-CString CImageItem::GetYearString()
-{
-    CTime time(m_nUnixTimeStamp);
-    CString year = time.Format(_T("%Y"));
-    return year;
 }
 
 CString CImageItem::GetStatusString()
@@ -89,6 +84,12 @@ bool CImageManager::CreateTable()
     modelColumn.dataType = DB_DATA_TYPE_STR;
     columnVec.push_back(modelColumn);
 
+    // year
+    COLUMN_ITEM yearColumn;
+    yearColumn.strName = COLUMN_YEAR;
+    yearColumn.dataType = DB_DATA_TYPE_INT;
+    columnVec.push_back(yearColumn);
+
     // time
     COLUMN_ITEM timeColumn;
     timeColumn.strName = COLUMN_TIMESTAMP;
@@ -100,6 +101,12 @@ bool CImageManager::CreateTable()
     filePathColumn.strName = COLUMN_FILE_PATH;
     filePathColumn.dataType = DB_DATA_TYPE_STR;
     columnVec.push_back(filePathColumn);
+
+    // origin file path
+    COLUMN_ITEM originFilePathColumn;
+    originFilePathColumn.strName = COLUMN_ORIGIN_FILE_PATH;
+    originFilePathColumn.dataType = DB_DATA_TYPE_STR;
+    columnVec.push_back(originFilePathColumn);
 
     // status
     COLUMN_ITEM statusColumn;
@@ -144,6 +151,13 @@ void CImageManager::GetColumnItems(const CImageItem& image, std::vector<COLUMN_I
     modelColumn.strValue = CImCharset::UnicodeToUTF8((LPCWSTR)image.m_strModel);
     columnVec.push_back(modelColumn);
 
+    // year
+    COLUMN_ITEM yearColumn;
+    yearColumn.strName = COLUMN_YEAR;
+    yearColumn.dataType = DB_DATA_TYPE_INT;
+    yearColumn.strValue = std::to_string(image.m_nYear);
+    columnVec.push_back(yearColumn);
+
     // time
     COLUMN_ITEM timeColumn;
     timeColumn.strName = COLUMN_TIMESTAMP;
@@ -157,6 +171,13 @@ void CImageManager::GetColumnItems(const CImageItem& image, std::vector<COLUMN_I
     filePathColumn.dataType = DB_DATA_TYPE_STR;
     filePathColumn.strValue = CImCharset::UnicodeToUTF8((LPCWSTR)image.m_strFilePath);
     columnVec.push_back(filePathColumn);
+
+    // origin file path
+    COLUMN_ITEM originFilePathColumn;
+    originFilePathColumn.strName = COLUMN_ORIGIN_FILE_PATH;
+    originFilePathColumn.dataType = DB_DATA_TYPE_STR;
+    originFilePathColumn.strValue = CImCharset::UnicodeToUTF8((LPCWSTR)image.m_strOriginFilePath);
+    columnVec.push_back(originFilePathColumn);
 
     // status
     COLUMN_ITEM statusColumn;
@@ -259,6 +280,10 @@ bool CImageManager::EnumRecord(void* context, const std::vector<COLUMN_ITEM>& re
         {
             imageItem.m_strModel = CImCharset::UTF8ToUnicode(record.strValue.c_str()).c_str();
         }
+        if (record.strName == COLUMN_YEAR)
+        {
+            imageItem.m_nYear = std::stoi(record.strValue.c_str());
+        }
         if (record.strName == COLUMN_TIMESTAMP)
         {
             imageItem.m_nUnixTimeStamp = std::stoi(record.strValue.c_str());
@@ -266,6 +291,10 @@ bool CImageManager::EnumRecord(void* context, const std::vector<COLUMN_ITEM>& re
         if (record.strName == COLUMN_FILE_PATH)
         {
             imageItem.m_strFilePath = CImCharset::UTF8ToUnicode(record.strValue.c_str()).c_str();
+        }
+        if (record.strName == COLUMN_ORIGIN_FILE_PATH)
+        {
+            imageItem.m_strOriginFilePath = CImCharset::UTF8ToUnicode(record.strValue.c_str()).c_str();
         }
         if (record.strName == COLUMN_STATUS)
         {
@@ -312,10 +341,7 @@ bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, u
         {
             strWhere += " AND ";
         }
-        string thisYear = to_string(GetUnixTime(nYear));
-        string nextYear = to_string(GetUnixTime(nYear + 1));
-        strWhere = strWhere + COLUMN_TIMESTAMP + ">=" + thisYear;
-        strWhere = strWhere + " AND " + COLUMN_TIMESTAMP + "<" + nextYear;
+        strWhere = strWhere + COLUMN_YEAR + "=" + to_string(nYear);
     }
 
     if (nStatus != 0)

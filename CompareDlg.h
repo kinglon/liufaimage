@@ -62,4 +62,6 @@ public:
 	afx_msg void OnClickedLastpagectrl();
 	afx_msg void OnClickedNextpagectrl();
 	afx_msg void OnClickedSavectrl();
+	afx_msg void OnBnClickedShoworiginimage();
+	afx_msg void OnBnClickedShowmaskimage();
 };

@@ -38,19 +38,20 @@ void CImgImportDlg::OnAddWaterMaskComplete(CString originImage, bool isSuccess, 
         }
         else
         {
-            std::tm timeInfo;
-            localtime_s(&timeInfo , &captureTime);
-            int year = timeInfo.tm_year + 1900;
+            CString strYear = std::to_wstring(CSettingManager::GetInstance()->GetYear()).c_str();
             CString imageFilePath = CImgFolderManager::GetInstance()->AddImage(
-                imageWithMask, std::to_wstring(year).c_str(), CSettingManager::GetInstance()->GetModelPrefix());
+                imageWithMask, strYear, CSettingManager::GetInstance()->GetModelPrefix());
+            CString originImageFilePath = CImgFolderManager::GetInstance()->AddOriginImage(originImage);
 
             CImageItem imageItem;
             imageItem.m_nStatus = IMAGE_STATUS_NOT_PROCESS;
             imageItem.m_nUnixTimeStamp = captureTime;
             imageItem.m_strFilePath = imageFilePath;
+            imageItem.m_strOriginFilePath = originImageFilePath;
             imageItem.m_strModel = model;
             imageItem.m_strWaterMaskTitle = CSettingManager::GetInstance()->GetWaterMarkTitle();
             imageItem.m_strWorkContent = CSettingManager::GetInstance()->GetWorkContent();
+            imageItem.m_nYear = CSettingManager::GetInstance()->GetYear();
             CImageManager::GetInstance()->AddImage(imageItem);
         }
     }
@@ -184,8 +185,9 @@ DWORD __stdcall CImgImportDlg::AddWaterMaskProc(LPVOID lpParam)
             continue;
         }
 
-        int year = CTimeUtil::GetYear(captureTime);
-        CString model = CImgFolderManager::GetInstance()->GetNextModelName(year);
+        int year = CSettingManager::GetInstance()->GetYear();
+        std::string modelPrefix = CImCharset::UnicodeToUTF8(CSettingManager::GetInstance()->GetModelPrefix());
+        CString model = CImgFolderManager::GetInstance()->GetNextModelName(year, modelPrefix);
         CWaterMaskUtil waterMaskUtil;
         CString imageWithMask = waterMaskUtil.AddWaterMask(image.c_str(),
             CSettingManager::GetInstance()->GetWaterMarkTitle(), captureTime, model,

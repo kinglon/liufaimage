@@ -1,10 +1,10 @@
 {
-    "log_level":2,   
+    "log_level":2,
     "model_next_index": [
-        {"year":"2023", "YD":1, "V":1, "A":1}
-    ],    
+    ],
     "model_prefix":"",    
     "title":"",
+    "year":2023,
 	"water_mask" : 
 	{
 		"font_color1" : "ffffffff",
@@ -12,7 +12,7 @@
 		"height" : 605,
 		"offset_bottom" : 66,
 		"offset_left" : 58,
-		"width" : 1060
+		"width" : 1200
 	},
     "work_content":""
 }

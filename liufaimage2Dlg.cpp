@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(Cliufaimage2Dlg, CDialogEx)
 	ON_COMMAND(ID_IMAGE_EDIT, &Cliufaimage2Dlg::OnImageEdit)
 	ON_COMMAND(ID_IMAGE_COMPARE, &Cliufaimage2Dlg::OnImageCompare)
 	ON_COMMAND(ID_IMAGE_DELETE, &Cliufaimage2Dlg::OnImageDelete)
+	ON_BN_CLICKED(IDC_IMPORT_FOLDER_CTRL, &Cliufaimage2Dlg::OnBnClickedImportFolderCtrl)
 END_MESSAGE_MAP()
 
 BOOL Cliufaimage2Dlg::OnInitDialog()
@@ -112,7 +113,7 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 	{
 		CImageItem& Item = m_CurrentImages[j];
 		m_imageListCtrl.InsertItem(j, Item.m_strModel);
-		m_imageListCtrl.SetItemText(j, 1, Item.GetDateTimeString());
+		m_imageListCtrl.SetItemText(j, 1, Item.GetCapturingDateTimeString());
 		m_imageListCtrl.SetItemText(j, 2, Item.GetStatusString());
 		m_imageListCtrl.SetItemText(j, 3, Item.m_strRemark);
 	}
@@ -194,7 +195,7 @@ void Cliufaimage2Dlg::OnBnClickedSetting()
 void Cliufaimage2Dlg::OnBnClickedExportImage()
 {
 	CImageImporter imgImporter;
-	imgImporter.Import(this);
+	imgImporter.ImportImageFiles(this);
 }
 
 void Cliufaimage2Dlg::OnNMRClickImageList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -260,8 +261,16 @@ void Cliufaimage2Dlg::OnImageDelete()
 	if (MessageBox(L"您确定要删除选择的图片吗？", L"提示", MB_OKCANCEL) == IDOK)
 	{
 		CImgFolderManager::GetInstance()->DeleteImage(m_CurrentImages[nImageIndex].m_strFilePath);
+		CImgFolderManager::GetInstance()->DeleteOriginImage(m_CurrentImages[nImageIndex].m_strOriginFilePath);
 		CImageManager::GetInstance()->DeleteImage(m_CurrentImages[nImageIndex].m_id);
 		m_CurrentImages.RemoveAt(nImageIndex);
 		ShowPage(m_nCurrentPageNumber);
 	}
+}
+
+
+void Cliufaimage2Dlg::OnBnClickedImportFolderCtrl()
+{
+	CImageImporter imgImporter;
+	imgImporter.ImportImageFolder(this);
 }

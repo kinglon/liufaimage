@@ -28,4 +28,5 @@ public:
 	CEdit m_modelPrefixCtrl;
 	CEdit m_workContentCtrl;
 	virtual BOOL OnInitDialog();
+	CEdit m_yearCtrl;
 };

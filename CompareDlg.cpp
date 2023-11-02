@@ -68,9 +68,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 	int currentYear = currentTm.tm_year + 1900;  // Add 1900 to get the actual year
 
 	// 获取当前图片的年份
-	std::tm currentImageTm;
-	localtime_s(&currentImageTm, &m_images->GetAt(imageIndex).m_nUnixTimeStamp);
-	int currentImgYear = currentImageTm.tm_year + 1900;  // Add 1900 to get the actual year
+	int currentImgYear = m_images->GetAt(imageIndex).m_nYear;
 
 	if (currentImgYear == currentYear)
 	{
@@ -107,7 +105,9 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_leftImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl1.SetWindowText(m_leftImageItem.GetYearString() + L"年  " + m_leftImageItem.m_strModel );
+		CString strModel;
+		strModel.Format(L"%d年  %s", m_leftImageItem.m_nYear, m_leftImageItem.m_strModel);
+		m_modelCtrl1.SetWindowText(strModel);
 		InitImageCtrl(&m_imageCtrl1, m_leftImageItem.m_strFilePath);
 		m_statusCtrl1.SetCurSel(m_leftImageItem.m_nStatus - 1);
 		m_remarkCtrl1.SetWindowText(m_leftImageItem.m_strRemark);
@@ -115,7 +115,9 @@ void CCompareDlg::ShowImage(int imageIndex)
 
 	if (!m_rightImageItem.m_strModel.IsEmpty())
 	{
-		m_modelCtrl2.SetWindowText(m_rightImageItem.GetYearString() + L"年  " + m_rightImageItem.m_strModel);
+		CString strModel;
+		strModel.Format(L"%d年  %s", m_rightImageItem.m_nYear, m_rightImageItem.m_strModel);		
+		m_modelCtrl2.SetWindowText(strModel);
 		InitImageCtrl(&m_imageCtrl2, m_rightImageItem.m_strFilePath);
 		m_statusCtrl2.SetCurSel(m_rightImageItem.m_nStatus - 1);
 		m_remarkCtrl2.SetWindowText(m_rightImageItem.m_strRemark);
@@ -190,6 +192,8 @@ BEGIN_MESSAGE_MAP(CCompareDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_LASTPAGECTRL, &CCompareDlg::OnClickedLastpagectrl)
 	ON_BN_CLICKED(IDC_NEXTPAGECTRL, &CCompareDlg::OnClickedNextpagectrl)
 	ON_BN_CLICKED(IDC_SAVECTRL, &CCompareDlg::OnClickedSavectrl)
+	ON_BN_CLICKED(IDC_SHOWORIGINIMAGE, &CCompareDlg::OnBnClickedShoworiginimage)
+	ON_BN_CLICKED(IDC_SHOWMASKIMAGE, &CCompareDlg::OnBnClickedShowmaskimage)
 END_MESSAGE_MAP()
 
 
@@ -293,4 +297,46 @@ void CCompareDlg::OnClickedSavectrl()
 	}
 
 	MessageBox(L"保存成功", L"提示", MB_OK);
+}
+
+
+void CCompareDlg::OnBnClickedShoworiginimage()
+{
+	m_imageCtrl1.SetBitmap(NULL);
+	m_imageCtrl2.SetBitmap(NULL);
+	for (auto& handle : m_imageHandle)
+	{
+		DeleteObject(handle);
+	}
+	m_imageHandle.clear();
+
+	if (!m_leftImageItem.m_strModel.IsEmpty())
+	{
+		InitImageCtrl(&m_imageCtrl1, m_leftImageItem.m_strOriginFilePath);
+	}
+	if (!m_rightImageItem.m_strModel.IsEmpty())
+	{
+		InitImageCtrl(&m_imageCtrl2, m_rightImageItem.m_strOriginFilePath);
+	}
+}
+
+
+void CCompareDlg::OnBnClickedShowmaskimage()
+{
+	m_imageCtrl1.SetBitmap(NULL);
+	m_imageCtrl2.SetBitmap(NULL);
+	for (auto& handle : m_imageHandle)
+	{
+		DeleteObject(handle);
+	}
+	m_imageHandle.clear();
+
+	if (!m_leftImageItem.m_strModel.IsEmpty())
+	{
+		InitImageCtrl(&m_imageCtrl1, m_leftImageItem.m_strFilePath);
+	}
+	if (!m_rightImageItem.m_strModel.IsEmpty())
+	{
+		InitImageCtrl(&m_imageCtrl2, m_rightImageItem.m_strFilePath);
+	}
 }
