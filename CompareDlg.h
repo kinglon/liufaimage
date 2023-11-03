@@ -18,7 +18,7 @@ public:
 #endif
 
 public:
-	void SetImages(CArray<CImageItem>* images, int nCurrentIndex);
+	void SetImages(CArray<CImageItem>* images, int nCurrentIndex, int nNumPerPage);
 
 private:
 	void ShowImage(int imageIndex);
@@ -32,6 +32,9 @@ private:
 
 	// 从0开始
 	int m_currentIndex = 0;
+
+	// 每页张数
+	int m_numPerPage = 10;
 
 	// model为空表示该图片无效
 	CImageItem m_leftImageItem;

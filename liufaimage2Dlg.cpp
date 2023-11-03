@@ -245,7 +245,7 @@ void Cliufaimage2Dlg::OnImageCompare()
 	}
 
 	CCompareDlg dlg;
-	dlg.SetImages(&m_CurrentImages, nSelIndex);
+	dlg.SetImages(&m_CurrentImages, nSelIndex, ITEMS_PER_PAGE);
 	dlg.DoModal();
 	ShowPage(m_nCurrentPageNumber);
 }

@@ -9,6 +9,7 @@
 #include "WaterMaskUtil.h"
 #include "SettingManager.h"
 #include "ImgFolderManager.h"
+#include "ImageManager.h"
 
 IMPLEMENT_DYNAMIC(CEditDlg, CDialogEx)
 
@@ -123,6 +124,7 @@ void CEditDlg::OnBnClickedUpdateimagectrl()
 		CString imageFilePath = waterMaskUtil.AddWaterMask(filePath, m_imageItem.m_strWaterMaskTitle, 
 			m_imageItem.m_nUnixTimeStamp, m_imageItem.m_strModel, m_imageItem.m_strWorkContent);
 		CImgFolderManager::GetInstance()->ReplaceImage(imageFilePath, m_imageItem.m_strFilePath);
+		CImgFolderManager::GetInstance()->ReplaceImage(filePath, m_imageItem.m_strOriginFilePath);
 		ShowImage();
 	}
 }
@@ -141,6 +143,14 @@ void CEditDlg::OnBnClickedOk()
 	if (model.IsEmpty())
 	{
 		MessageBox(L"型号不能为空", L"提示", MB_OK);
+		return;
+	}
+
+	CArray<CImageItem> images;
+	CImageManager::GetInstance()->FindImage(model, m_imageItem.m_nYear, 0, 0, 1, images);
+	if (images.GetSize() > 0)
+	{
+		MessageBox(L"型号已经存在", L"提示", MB_OK);
 		return;
 	}
 

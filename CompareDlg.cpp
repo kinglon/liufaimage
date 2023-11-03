@@ -28,10 +28,11 @@ CCompareDlg::~CCompareDlg()
 	m_imageHandle.clear();
 }
 
-void CCompareDlg::SetImages(CArray<CImageItem>* images, int nCurrentIndex)
+void CCompareDlg::SetImages(CArray<CImageItem>* images, int nCurrentIndex, int nNumPerPage)
 {
 	m_images = images;
 	m_currentIndex = nCurrentIndex;
+	m_numPerPage = nNumPerPage;
 }
 
 void CCompareDlg::DoDataExchange(CDataExchange* pDX)
@@ -61,44 +62,17 @@ void CCompareDlg::ShowImage(int imageIndex)
 		return;
 	}
 
-	// 获取今年的年份
-	time_t currentTime = time(NULL);
-	std::tm currentTm;
-	localtime_s(&currentTm, &currentTime);
-	int currentYear = currentTm.tm_year + 1900;  // Add 1900 to get the actual year
-
-	// 获取当前图片的年份
-	int currentImgYear = m_images->GetAt(imageIndex).m_nYear;
-
-	if (currentImgYear == currentYear)
+	m_leftImageItem = m_images->GetAt(imageIndex);
+	CArray<CImageItem> lastYearImages;
+	CImageManager::GetInstance()->FindImage(m_leftImageItem.m_strModel, m_leftImageItem.m_nYear - 1,
+		0, 0, 1, lastYearImages);
+	if (lastYearImages.GetSize() > 0)
 	{
-		m_leftImageItem = m_images->GetAt(imageIndex);
-		CArray<CImageItem> lastYearImages;
-		CImageManager::GetInstance()->FindImage(m_leftImageItem.m_strModel, currentYear - 1,
-			0, 0, 1, lastYearImages);
-		if (lastYearImages.GetSize() > 0)
-		{
-			m_rightImageItem = lastYearImages.GetAt(0);
-		}
-		else
-		{
-			m_rightImageItem.m_strModel = L"";
-		}
+		m_rightImageItem = lastYearImages.GetAt(0);
 	}
 	else
 	{
-		m_rightImageItem = m_images->GetAt(imageIndex);
-		CArray<CImageItem> thisYearImages;
-		CImageManager::GetInstance()->FindImage(m_rightImageItem.m_strModel, currentYear, 0,
-			0, 1, thisYearImages);
-		if (thisYearImages.GetSize() > 0)
-		{
-			m_leftImageItem = thisYearImages.GetAt(0);
-		}
-		else
-		{
-			m_leftImageItem.m_strModel = L"";
-		}
+		m_rightImageItem.m_strModel = L"";
 	}
 
 	ResetAllCtrl();
@@ -124,7 +98,7 @@ void CCompareDlg::ShowImage(int imageIndex)
 	}
 
 	m_lastPieceCtrl1.EnableWindow(imageIndex > 0);
-	m_nextPieceCtrl.EnableWindow(imageIndex < m_images->GetSize() - 1);
+	m_nextPieceCtrl.EnableWindow(imageIndex < min(m_images->GetSize() - 1, m_numPerPage - 1));
 }
 
 void CCompareDlg::ResetAllCtrl()
