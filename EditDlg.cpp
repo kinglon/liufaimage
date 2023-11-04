@@ -145,14 +145,16 @@ void CEditDlg::OnBnClickedOk()
 		MessageBox(L"型号不能为空", L"提示", MB_OK);
 		return;
 	}
-
-	CArray<CImageItem> images;
-	CImageManager::GetInstance()->FindImage(model, m_imageItem.m_nYear, 0, 0, 1, images);
-	if (images.GetSize() > 0)
+	else if (model != m_imageItem.m_strModel)
 	{
-		MessageBox(L"型号已经存在", L"提示", MB_OK);
-		return;
-	}
+		CArray<CImageItem> images;
+		CImageManager::GetInstance()->FindImage(model, m_imageItem.m_nYear, 0, 0, 1, images);
+		if (images.GetSize() > 0)
+		{
+			MessageBox(L"型号已经存在", L"提示", MB_OK);
+			return;
+		}
+	}	
 
 	m_imageItem.m_strModel = model;
 	m_remarkCtrl.GetWindowText(m_imageItem.m_strRemark);
