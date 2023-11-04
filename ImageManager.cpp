@@ -318,17 +318,8 @@ bool CImageManager::EnumRecord(void* context, const std::vector<COLUMN_ITEM>& re
     return true;
 }
 
-bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, unsigned int nOffset, unsigned int nLimit, CArray<CImageItem>& images)
+std::string CImageManager::GetCondition(const CString& strModel, int nYear, int nStatus)
 {
-    if (!m_dbUtil.IsAlreadyOpen())
-    {
-        LOG_ERROR(L"the database is not open");
-        return false;
-    }
-
-    images.RemoveAll();
-
-    //构造条件语句
     std::string strWhere;
     if (!strModel.IsEmpty())
     {
@@ -349,10 +340,24 @@ bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, u
         if (!strWhere.empty())
         {
             strWhere += " AND ";
-        }        
+        }
         strWhere = strWhere + COLUMN_STATUS + "=" + to_string(nStatus);
     }
 
+    return strWhere;
+}
+
+bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, unsigned int nOffset, unsigned int nLimit, CArray<CImageItem>& images)
+{
+    if (!m_dbUtil.IsAlreadyOpen())
+    {
+        LOG_ERROR(L"the database is not open");
+        return false;
+    }
+
+    images.RemoveAll();
+
+    std::string strWhere = GetCondition(strModel, nYear, nStatus);
     int nResult = m_dbUtil.Query(TABLE_NAME, strWhere, nOffset, nLimit, EnumRecord, &images);
     if (nResult != 0)
     {
@@ -360,6 +365,19 @@ bool CImageManager::FindImage(const CString& strModel, int nYear, int nStatus, u
     }
 
     return true;
+}
+
+int CImageManager::GetCount(const CString& strModel, int nYear, int nStatus)
+{
+    if (!m_dbUtil.IsAlreadyOpen())
+    {
+        LOG_ERROR(L"the database is not open");
+        return false;
+    }
+
+    std::string strWhere = GetCondition(strModel, nYear, nStatus);
+    int nCount = m_dbUtil.Count(TABLE_NAME, strWhere);
+    return nCount;
 }
 
 time_t CImageManager::GetUnixTime(int year)

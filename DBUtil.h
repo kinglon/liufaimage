@@ -83,8 +83,13 @@ public:
 	//返回值0表示成功，其他值表示错误代码
 	int Query(const std::string& strTableName, const std::string& strWhere, int nOffset, int nLimit, PEnumRecord EnumRecord, void* context);
 
+	//查询满足strWhere的记录的总数
+	//返回值0表示成功，其他值表示错误代码
+	int Count(const std::string& strTableName, const std::string& strWhere);
+
 protected:	
-	static int ExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName);  //sql执行回调函数
+	static int QueryExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName);
+	static int CountExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName);
 	std::string ConstructInsertSqlStatement(const std::string& strTableName, const std::vector<COLUMN_ITEM>& columnVec);  //构造一条SQL语句
 
 protected:

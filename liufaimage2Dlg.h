@@ -45,6 +45,7 @@ protected:
 public:
 	CComboBox m_statusComboBox;
 	CStatic m_pageNumberCtrl;
+	CStatic m_totalCtrl;
 	CButton m_lastPageCtrl;
 	CButton m_nextPageCtrl;
 	CListCtrl m_imageListCtrl;

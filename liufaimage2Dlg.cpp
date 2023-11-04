@@ -27,6 +27,7 @@ void Cliufaimage2Dlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_STATUS_LIST, m_statusComboBox);
 	DDX_Control(pDX, IDC_PAGE_NUMBER, m_pageNumberCtrl);
+	DDX_Control(pDX, IDC_TOTALCTRL, m_totalCtrl);
 	DDX_Control(pDX, IDC_LAST_PAGE, m_lastPageCtrl);
 	DDX_Control(pDX, IDC_NEXT_PAGE, m_nextPageCtrl);
 	DDX_Control(pDX, IDC_IMAGE_LIST, m_imageListCtrl);
@@ -91,10 +92,17 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 	int offset = (nPageNumber - 1) * ITEMS_PER_PAGE;
 	int limit = ITEMS_PER_PAGE + 1; // 多获取一个，用于判断是否有下一页
 	CImageManager::GetInstance()->FindImage(m_filterModel, m_filterYear, m_filterStatus, offset, limit, m_CurrentImages);
-	
-	// 没有任何图片
-	if (m_CurrentImages.GetSize() == 0)
+	int totalCount = CImageManager::GetInstance()->GetCount(m_filterModel, m_filterYear, m_filterStatus);
+	int totalPageCount = 0;
+	if (totalCount > 0)
 	{
+		totalPageCount = (totalCount - 1) / ITEMS_PER_PAGE + 1;
+	}
+
+	// 没有任何图片
+	if (totalCount == 0)
+	{
+		m_totalCtrl.SetWindowText(CString(L"总数：0"));
 		m_pageNumberCtrl.SetWindowText(L"0/0");
 		m_lastPageCtrl.EnableWindow(FALSE);
 		m_nextPageCtrl.EnableWindow(FALSE);
@@ -105,6 +113,10 @@ void Cliufaimage2Dlg::ShowPage(int nPageNumber)
 	// 初始翻页按钮
 	m_lastPageCtrl.EnableWindow(nPageNumber > 1);
 	m_nextPageCtrl.EnableWindow(m_CurrentImages.GetSize() > ITEMS_PER_PAGE);
+	CString pageIndex;
+	pageIndex.Format(L"%d/%d", nPageNumber, totalPageCount);
+	m_pageNumberCtrl.SetWindowText(pageIndex);
+	m_totalCtrl.SetWindowText(CString(L"总数：") + std::to_wstring(totalCount).c_str());
 
 	// 插入数据
 	m_imageListCtrl.DeleteAllItems();

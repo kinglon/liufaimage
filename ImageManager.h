@@ -63,7 +63,10 @@ public:
 	// nYear为0表示所有年份
 	// nStatus为0表示所有状态
 	bool FindImage(const CString& strModel, int nYear, int nStatus, unsigned int nOffset, unsigned int nLimit, CArray<CImageItem>& images);
-
+	
+	// 参数与FindImage相同
+	int GetCount(const CString& strModel, int nYear, int nStatus);
+	
 private:
 	bool CreateTable();
 
@@ -73,6 +76,8 @@ private:
 
 	// 获取所有列项，除了id
 	void GetColumnItems(const CImageItem& image, std::vector<COLUMN_ITEM>& columnVec);
+
+	std::string GetCondition(const CString& strModel, int nYear, int nStatus);
 
 private:
 	CDBUtil m_dbUtil;

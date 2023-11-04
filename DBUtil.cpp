@@ -7,7 +7,7 @@ using namespace std;
 struct EnumRecordStruct
 {
 	PEnumRecord EnumRecord;
-	void* context;
+	void* context = nullptr;
 };
 
 CDBUtil::CDBUtil()
@@ -327,7 +327,7 @@ int CDBUtil::Query(const std::string& strTableName, const std::string& strWhere,
         sprintf_s(szSQL, 10 * MAX_PATH, "select * from %s where %s order by id DESC limit %d offset %d", strTableName.c_str(), strWhere.c_str(), nLimit, nOffset);
     }
 
-    int nRet = sqlite3_exec(m_pDBConnection, szSQL, ExecuteCallbac, &tempStruct, NULL);
+    int nRet = sqlite3_exec(m_pDBConnection, szSQL, QueryExecuteCallbac, &tempStruct, NULL);
 	if (nRet != SQLITE_OK)
 	{
         LOG_ERROR(L"failed to execute sql(%s), error=%d", CImCharset::UTF8ToUnicode(szSQL).c_str(), nRet);
@@ -337,7 +337,45 @@ int CDBUtil::Query(const std::string& strTableName, const std::string& strWhere,
 	return ERROR_DBUtil_Success;
 }
 
-int CDBUtil::ExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName)
+int CDBUtil::Count(const std::string& strTableName, const std::string& strWhere)
+{
+	if (m_pDBConnection == NULL)
+	{
+		return ERROR_DBUtil_HasNotOpen;
+	}
+
+	char szSQL[10 * MAX_PATH];
+	memset(szSQL, 0, sizeof(szSQL));
+	if (strWhere.empty())  //无条件
+	{
+		sprintf_s(szSQL, 10 * MAX_PATH, "select count(*) from %s", strTableName.c_str());
+	}
+	else
+	{
+		sprintf_s(szSQL, 10 * MAX_PATH, "select count(*) from %s where %s", strTableName.c_str(), strWhere.c_str());
+	}
+
+	int count = 0;
+	int nRet = sqlite3_exec(m_pDBConnection, szSQL, CountExecuteCallbac, &count, NULL);
+	if (nRet != SQLITE_OK)
+	{
+		LOG_ERROR(L"failed to execute sql(%s), error=%d", CImCharset::UTF8ToUnicode(szSQL).c_str(), nRet);
+		return 0;
+	}
+
+	return count;
+}
+
+int CDBUtil::CountExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName)
+{
+	if (nColumnCount == 1)
+	{
+		*(int*)context = stoi(ppColumnValue[0]);
+	}
+	return 0;
+}
+
+int CDBUtil::QueryExecuteCallbac(void* context, int nColumnCount, char** ppColumnValue, char** ppColumnName)
 {
 	EnumRecordStruct* pContext = (EnumRecordStruct*)context;
 	if (pContext->EnumRecord == NULL)  //没有回调
